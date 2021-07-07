@@ -31,13 +31,11 @@ func Validate(input []byte) WebData {
 	}
 
 	for k, v := range payload.Auths {
-		//fmt.Println("Esto es una key: ", k)
-		//fmt.Println("y esto su valor: ", v.Auth)
-		//fmt.Println("y esto su valor: ", v.Auth)
+
 		sDec, _ := b64.StdEncoding.DecodeString(v.Auth)
 		auth := string(sDec)
 		err, res := loginToRegistry(k, auth)
-		if err != nil {
+		if err != nil || res == RES_CONERROR {
 			resultKOConArray = append(resultKOConArray, k+"\n"...)
 		} else if err == nil && res == RES_VALID {
 			resultOKArray = append(resultOKArray, k+"\n"...)
@@ -49,6 +47,7 @@ func Validate(input []byte) WebData {
 }
 
 func loginToRegistry(url, auth string) (error, string) {
+
 	req, err := http.NewRequest("GET", "https://"+url+"/v2/auth", nil)
 	if err != nil {
 		return err, RES_CONERROR
@@ -57,11 +56,17 @@ func loginToRegistry(url, auth string) (error, string) {
 	req.SetBasicAuth(s[0], s[1])
 
 	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		return err, RES_CONERROR
-
+	} else if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusAccepted {
+		return nil, RES_VALID
+	} else if resp.StatusCode == http.StatusNotFound {
+		return nil, RES_CONERROR
+	} else if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+		return nil, RES_EXPIRED
+	} else {
+		return err, RES_CONERROR
 	}
-
 	defer resp.Body.Close()
-	return nil, ""
 }
