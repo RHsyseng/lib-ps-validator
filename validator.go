@@ -16,14 +16,14 @@ const (
 	CONN_ERROR   = "no such host"
 )
 
-var (
-	payload          Payload
-	resultOKArray    []byte
-	resultKOArray    []byte
-	resultKOConArray []byte
-)
-
 func Validate(input []byte) WebData {
+
+	var (
+		payload          Payload
+		resultOKArray    []byte
+		resultKOArray    []byte
+		resultKOConArray []byte
+	)
 
 	err := json.Unmarshal(input, &payload)
 	if err != nil {
