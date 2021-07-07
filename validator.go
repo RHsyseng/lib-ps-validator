@@ -18,21 +18,16 @@ const (
 
 func Validate(input []byte) WebData {
 
-	var (
-		payload          Payload
-		resultOKArray    []byte
-		resultKOArray    []byte
-		resultKOConArray []byte
-	)
+	var payload Payload
 
 	err := json.Unmarshal(input, &payload)
 	if err != nil {
 		fmt.Println(ERROR, err)
 	}
 
-	resultKOConArray = make([]byte, len(payload.Auths-1))
-	resultKOArray = make([]byte, len(payload.Auths-1))
-	resultOKArray = make([]byte, len(payload.Auths-1))
+	resultKOConArray := make([]byte, 100)
+	resultKOArray := make([]byte, 100)
+	resultOKArray := make([]byte, 100)
 
 	for k, v := range payload.Auths {
 
