@@ -34,12 +34,17 @@ func Validate(input []byte) WebData {
 
 		sDec, _ := b64.StdEncoding.DecodeString(v.Auth)
 		auth := string(sDec)
+
 		err, res := loginToRegistry(k, auth)
+		fmt.Println("xxxxxxx")
 		if err != nil || res == RES_CONERROR {
 			resultKOConArray = append(resultKOConArray, k+"\n"...)
-		} else if err == nil && res == RES_VALID {
+			fmt.Println("KOCON-" + k + "\n")
+		} else if res == RES_VALID {
+			fmt.Println("OK-" + k + "\n")
 			resultOKArray = append(resultOKArray, k+"\n"...)
-		} else if err == nil && res == RES_EXPIRED {
+		} else if res == RES_EXPIRED {
+			fmt.Println("KOexpired-" + k + "\n")
 			resultKOArray = append(resultKOArray, k+"\n"...)
 		}
 	}
@@ -52,13 +57,14 @@ func loginToRegistry(url, auth string) (error, string) {
 	if err != nil {
 		return err, RES_CONERROR
 	}
+
 	s := strings.Split(auth, ":")
 	req.SetBasicAuth(s[0], s[1])
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err2 := http.DefaultClient.Do(req)
 
-	if err != nil {
-		return err, RES_CONERROR
+	if err2 != nil {
+		return err2, RES_CONERROR
 	} else if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusAccepted {
 		return nil, RES_VALID
 	} else if resp.StatusCode == http.StatusNotFound {
@@ -68,5 +74,23 @@ func loginToRegistry(url, auth string) (error, string) {
 	} else {
 		return err, RES_CONERROR
 	}
+
 	defer resp.Body.Close()
+	return nil, ""
+	/*
+
+		if err2 != nil {
+			return err2, RES_CONERROR
+		} else if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusAccepted {
+			return nil, RES_VALID
+		} else if resp.StatusCode == http.StatusNotFound {
+			return nil, RES_CONERROR
+		} else if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+			return nil, RES_EXPIRED
+		} else {
+			return err, RES_CONERROR
+		}
+		defer resp.Body.Close()
+
+	*/
 }
