@@ -60,10 +60,7 @@ func loginToRegistry(url, auth string) (error,string) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err, RES_CONERROR
-	} else {
-		if resp.
-	}
+
 	defer resp.Body.Close()
-	return nil
+	return nil,""
 }
-strings.Contains(err.Error(), CONN_ERROR)
