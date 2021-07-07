@@ -61,7 +61,7 @@ func loginToRegistry(url, auth string) (error, string) {
 		return err, RES_CONERROR
 
 	}
-	return nil, ""
-	defer resp.Body.Close()
 
+	defer resp.Body.Close()
+	return nil, ""
 }
