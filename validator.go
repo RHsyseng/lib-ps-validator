@@ -30,9 +30,9 @@ func Validate(input []byte) WebData {
 		fmt.Println(ERROR, err)
 	}
 
-	resultKOConArray = []byte()
-	resultKOArray = []byte()
-	resultOKArray = []byte()
+	resultKOConArray = []byte("")
+	resultKOArray = []byte("")
+	resultOKArray = []byte("")
 
 	for k, v := range payload.Auths {
 
