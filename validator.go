@@ -25,9 +25,9 @@ func Validate(input []byte) WebData {
 		fmt.Println(ERROR, err)
 	}
 
-	resultKOConArray := []byte("")
-	resultKOArray := []byte("")
-	resultOKArray := []byte("")
+	var resultKOConArray []string
+	var resultKOArray []string
+	var resultOKArray []string
 
 	for k, v := range payload.Auths {
 
@@ -36,14 +36,14 @@ func Validate(input []byte) WebData {
 
 		err, res := loginToRegistry(k, auth)
 		if err != nil || res == RES_CONERROR {
-			resultKOConArray = append(resultKOConArray, k+"\n"...)
+			resultKOConArray = append(resultKOConArray, k+"\n")
 		} else if res == RES_VALID {
-			resultOKArray = append(resultOKArray, k+"\n"...)
+			resultOKArray = append(resultOKArray, k+"\n")
 		} else if res == RES_EXPIRED {
-			resultKOArray = append(resultKOArray, k+"\n"...)
+			resultKOArray = append(resultKOArray, k+"\n")
 		}
 	}
-	return WebData{input, string(resultOKArray), string(resultKOArray), string(resultKOConArray)}
+	return WebData{input, resultOKArray, resultKOArray, resultKOConArray}
 }
 
 func loginToRegistry(url, auth string) (error, string) {
