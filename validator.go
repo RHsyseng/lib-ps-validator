@@ -1,6 +1,7 @@
 package lib_ps_validator
 
 import (
+	"crypto/tls"
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -31,7 +32,10 @@ func Validate(input []byte) WebData {
 
 	for k, v := range payload.Auths {
 
-		sDec, _ := b64.StdEncoding.DecodeString(v.Auth)
+		sDec, err := b64.StdEncoding.DecodeString(v.Auth)
+		if err != nil {
+			return WebData{input, "", "", ""}
+		}
 		auth := string(sDec)
 
 		err, res := loginToRegistry(k, auth)
@@ -56,13 +60,28 @@ func loginToRegistry(url, auth string) (error, string) {
 	s := strings.Split(auth, ":")
 	req.SetBasicAuth(s[0], s[1])
 
-	resp, err2 := http.DefaultClient.Do(req)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{Transport: tr, Timeout: 15 * time.Second}
+	resp, err2 := client.Do(req)
 
 	if err2 != nil {
 		return err2, RES_CONERROR
 	} else if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusAccepted {
 		return nil, RES_VALID
 	} else if resp.StatusCode == http.StatusNotFound {
+		reqWithoutAuth, _ := http.NewRequest("GET", "https://"+url+"/v2/", nil)
+		reqWithoutAuth.SetBasicAuth(s[0], s[1])
+		respWithoutAuth, errWithoutAuth := client.Do(reqWithoutAuth)
+		if errWithoutAuth != nil || respWithoutAuth.StatusCode == http.StatusNotFound {
+			return err2, RES_CONERROR
+		} else if errWithoutAuth == nil && (respWithoutAuth.StatusCode == http.StatusOK || respWithoutAuth.StatusCode == http.StatusAccepted) {
+			return nil, RES_VALID
+		} else if errWithoutAuth == nil && (respWithoutAuth.StatusCode == http.StatusUnauthorized || respWithoutAuth.StatusCode == http.StatusForbidden) {
+			return nil, RES_EXPIRED
+		}
 		return nil, RES_CONERROR
 	} else if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
 		return nil, RES_EXPIRED
