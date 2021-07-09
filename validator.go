@@ -15,7 +15,6 @@ const (
 	RES_EXPIRED  = "expired"
 	RES_CONERROR = "conn-error"
 	ERROR        = "error"
-	CONN_ERROR   = "no such host"
 )
 
 func Validate(input []byte) WebData {
@@ -89,8 +88,4 @@ func loginToRegistry(url, auth string) (error, string) {
 	} else {
 		return err, RES_CONERROR
 	}
-
-	defer resp.Body.Close()
-	return nil, ""
-
 }
