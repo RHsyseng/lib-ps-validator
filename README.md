@@ -4,6 +4,8 @@
 
 ## Description
 
+**This repository and its contents are completely UNSUPPORTED in any way and are not part of official documentation.**
+
 Lib to validate a pull secret:
 
 - Inputs: [] byte (with the pull secret in json format)
@@ -13,6 +15,7 @@ Lib to validate a pull secret:
   - Connection Issues (Sometimes could be an internal registry with some problems to be connected)
   
 ![img.png](img.png)
+
 ## How to use it
 
 Just import or get the package using this command:
