@@ -12,6 +12,7 @@ Lib to validate a pull secret:
   - Expired Entries
   - Connection Issues (Sometimes could be an internal registry with some problems to be connected)
   
+![img.png](img.png)
 ## How to use it
 
 Just import or get the package using this command:
