@@ -89,58 +89,6 @@ func TestValidate_JsonKO_WITHOUT(t *testing.T) {
 
 }
 
-func TestValidate_JsonOK_FirstReq_AUTH(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/v2/auth", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-	})
-	mux.HandleFunc("/someotherroute/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(404)
-	})
-
-	ts := httptest.NewTLSServer(mux)
-	conn, _ := net.Dial("tcp", ts.Listener.Addr().String())
-	defer conn.Close()
-
-	json_OK2 := []byte(`{
-	"auths": {
-		"` + ts.URL[len("https://"):] + `": {
-			"auth": "aG9sYTpwYXNz"
-		}
-	 }
-}
-`)
-
-	actual := Validate(json_OK2)
-	assert.Contains(t, actual.ResultOK, Output_Valid.ResultOK)
-
-}
-
-func TestValidate_JsonOK_SecondReq_V2(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/v2/auth", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(404)
-	})
-	mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-	})
-
-	ts := httptest.NewTLSServer(mux)
-	conn, _ := net.Dial("tcp", ts.Listener.Addr().String())
-	defer conn.Close()
-
-	json_OK2 := []byte(`{
-	"auths": {
-		"` + ts.URL[len("https://"):] + `": {
-			"auth": "aG9sYTpwYXNz"
-		}
-	 }
-}
-`)
-	actual := Validate(json_OK2)
-	assert.Contains(t, actual.ResultOK, Output_Valid.ResultOK)
-}
-
 func TestValidate_JsonKO_tokenUnauthorized_FirstReq(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v2/auth", func(w http.ResponseWriter, r *http.Request) {
