@@ -56,7 +56,7 @@ func loginToRegistry(url, auth string) (error, string) {
 		ctx := context.Background()
 		err := docker.CheckAuth(ctx, nil, s[0], s[1], url)
 		if err != nil {
-			if strings.Contains(err.Error(), "no such host") {
+			if strings.Contains(err.Error(), "no such host") || strings.Contains(err.Error(), "error pinging docker registry") {
 				return err, RES_CONERROR
 			}
 			return nil, RES_EXPIRED
